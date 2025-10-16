@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tumor Segmentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
+        h1 { color: #333; }
+        input[type="file"] { margin: 20px 0; }
+        img { max-width: 80%; margin-top: 20px; border: 2px solid #ccc; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Upload MRI/Tumor Image</h1>
+    <form id="upload-form">
+        <input type="file" id="file-input" name="file" accept="image/*" required><br>
+        <button type="submit">Predict Tumor</button>
+    </form>
+
+    <h2>Output Overlay:</h2>
+    <img id="output-image" src="" alt="Overlay will appear here">
+
+    <script>
+        const form = document.getElementById("upload-form");
+        const outputImg = document.getElementById("output-image");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const fileInput = document.getElementById("file-input");
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error("Prediction failed");
+
+                // Convert response to blob and display
+                const blob = await response.blob();
+                outputImg.src = URL.createObjectURL(blob);
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+    </script>
+</body>
+</html>
